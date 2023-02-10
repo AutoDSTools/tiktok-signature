@@ -1,12 +1,8 @@
-ECR_REPO = '956449821269.dkr.ecr.us-west-2.amazonaws.com/autoorder-api-v2'
+ECR_REPO = '956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature'
 def appList = [
 ]
 
-ECR_REPO_REGION = "956449821269.dkr.ecr.eu-west-3.amazonaws.com/tiktok-signature"
-CONTEXT = "arn:aws:eks:eu-west-3:956449821269:cluster/autods-eks-paris"
-deployApp = "tiktok-signature"
-
-def env = ['develop':'staging','master':'prod']
+def env = ['develop':'staging-scrapers','master':'prod-scrapers']
 projectName = JOB_NAME.split('/')[0].toLowerCase()
 TAG = "${BRANCH_NAME}-0.1.${BUILD_NUMBER}"
 currentBuild.displayName = "#${currentBuild.id}_${TAG}"
