@@ -4,7 +4,7 @@ const Utils = require("./utils");
 const iPhone11 = devices["iPhone 11 Pro"];
 class Signer {
   userAgent =
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36";
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36";
   args = [
     "--disable-blink-features",
     "--disable-blink-features=AutomationControlled",
