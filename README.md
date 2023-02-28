@@ -22,10 +22,18 @@ npm i tiktok-signature
 docker build . -t tiktok-signature
 ```
 
+```sh
+docker buildx build -t tiktok-signature --platform=linux/amd64 --progress=plain .
+```
+
 #### Run
 
 ```sh
 docker run -p 80:8080 -v $(pwd):/usr/app tiktok-signature
+```
+
+```sh
+docker run -it -p 80:8080 --platform linux/amd64 --name tiktok-signature -v $(pwd):/usr/app tiktok-signature
 ```
 
 ## Example
