@@ -53,6 +53,7 @@ class Signer {
       isMobile: Math.random() > 0.5,
       hasTouch: Math.random() > 0.5,
       userAgent: this.userAgent,
+      bypassCSP: true,
     };
     emulateTemplate.viewport.width = Utils.getRandomInt(320, 1920);
     emulateTemplate.viewport.height = Utils.getRandomInt(320, 1920);
