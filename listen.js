@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 8080;
 
     server.on("request", (request, response) => {
       const now = new Date().toLocaleString();
-      console.log("[${now}] - ${request.method} - ${request.url}");
+      console.log( now + " - " + request.method + " - " + request.url);
 
       response.setHeader("Access-Control-Allow-Origin", "*");
       response.setHeader("Access-Control-Allow-Headers", "*");
