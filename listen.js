@@ -25,6 +25,9 @@ const PORT = process.env.PORT || 8080;
     signer.init();
 
     server.on("request", (request, response) => {
+      const now = new Date().toLocaleString();
+      console.log( now + " - " + request.method + " - " + request.url);
+
       response.setHeader("Access-Control-Allow-Origin", "*");
       response.setHeader("Access-Control-Allow-Headers", "*");
 
@@ -41,7 +44,7 @@ const PORT = process.env.PORT || 8080;
         });
 
         request.on("end", async function () {
-          console.log("Received url: " + url);
+          // console.log("Received url: " + url);
 
           try {
             const sign = await signer.sign(url);
@@ -56,7 +59,7 @@ const PORT = process.env.PORT || 8080;
             });
             response.writeHead(200, { "Content-Type": "application/json" });
             response.end(output);
-            console.log(output);
+            // console.log(output);
           } catch (err) {
             console.log(err);
             // Uncomment if you want to auto-exit this application when an error thrown
