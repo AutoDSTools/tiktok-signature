@@ -61,11 +61,11 @@ const PORT = process.env.PORT || 8080;
             console.log(err);
             // Uncomment if you want to auto-exit this application when an error thrown
             // If you use PM2 or Supervisord, it will attempt to open it
-            // var timeElapsed = new Date() - start;
-            // console.info("Execution time: %dms", timeElapsed);
-            // if (timeElapsed > 2500) {
-            //   process.exit(1);
-            // }
+            var timeElapsed = new Date() - start;
+            console.info("Execution time: %dms", timeElapsed);
+            if (timeElapsed > 2500) {
+              process.exit(1);
+            }
           }
         });
       } else {
