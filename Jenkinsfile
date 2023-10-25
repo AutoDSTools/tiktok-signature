@@ -51,6 +51,14 @@ timestamps {
                 }
             }
 
+            stage('Check vulnerabilities') {
+                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: "docker:${ECR_REPO}:${TAG}"
+                recordIssues(tools: [grype(id: 'grype', name: 'Grype', pattern: '**/grype-report.json')])
+                if (BRANCH_NAME.contains('PR-') == false) {
+                    mineRepository scm: 'tiktok-signature'
+                }
+            }
+
             if (BRANCH_NAME in env.keySet()) {
                 stage('Get list of deployments') {
                     withEnv([
