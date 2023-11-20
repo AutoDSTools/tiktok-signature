@@ -1,3 +1,7 @@
+properties([
+    disableConcurrentBuilds()
+])
+
 ECR_REPO = '956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature'
 def appList = [
 ]
@@ -32,16 +36,12 @@ DOCKER_VERSION_TOOLBOX = "public.ecr.aws/b0y9w6l0/devops:alpine-k8s-1.24.10"
 DOCKER_BASE_TOOLBOX = "docker run --rm \
     --log-driver none \
     --env-file <(bash -c 'env | grep AWS_') \
+    -w /apps \
     -v ~/.kube:/root/.kube \
     -v ~/.aws/:/root/.aws \
     -v ~/.docker/:/root/.docker"
 
 DOCKER_TOOLBOX = "${DOCKER_BASE_TOOLBOX} \
-    ${DOCKER_VERSION_TOOLBOX}"
-
-DOCKER_TOOLBOX_HELM = "${DOCKER_BASE_TOOLBOX} \
-    -w /apps \
-    -v \$(pwd):/apps \
     ${DOCKER_VERSION_TOOLBOX}"
 
 timestamps {
@@ -76,7 +76,9 @@ timestamps {
                     ]) {
                         appListStr = sh (
                                 returnStdout: true,
-                                script: '${DOCKER_TOOLBOX} kubectl get -n ${NAMESPACE} --context=eks -o custom-columns=NAME:.metadata.name deployment | grep \'^tiktok-signature\' | awk \'{ quote = "\'\\\'\'"; finish = quote":"quote"deploy"quote; deployStr = quote $1 finish ; print deployStr}\' '
+                                script: """
+                                    ${DOCKER_TOOLBOX} kubectl get -n ${NAMESPACE} --context=eks -o custom-columns=NAME:.metadata.name deployment | grep '^tiktok-signature' | awk '{ quote = "\'\\\'\'"; finish = quote":"quote"deploy"quote; deployStr = quote \$1 finish ; print deployStr}' 
+                                """
                         ).trim()
                     }
                     appList = appListStr.split( '\n' ).collectEntries { entry ->
