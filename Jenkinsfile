@@ -69,11 +69,17 @@ timestamps {
             }
 
             stage('Check vulnerabilities') {
-                grypeScan autoInstall: true, repName: 'grypeReport_${JOB_NAME}_${BUILD_NUMBER}.txt', scanDest: "docker:${ECR_REPO}:${TAG}"
+                sh """
+                    docker pull anchore/grype:latest
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v ~/.docker/:/root/.docker \
+                        anchore/grype:latest \
+                        -o json \
+                        docker:${ECR_REPO}:${TAG} \
+                        | cat > grype-report.json
+                """
                 recordIssues(tools: [grype(id: 'grype', name: 'Grype', pattern: '**/grype-report.json')])
-                if (BRANCH_NAME.contains('PR-') == false) {
-                    mineRepository scm: 'tiktok-signature'
-                }
             }
 
             if (BRANCH_NAME in env.keySet()) {
