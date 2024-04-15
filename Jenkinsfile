@@ -3,6 +3,7 @@ properties([
 ])
 
 ECR_REPO = '956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature'
+def ECR_CACHE_REPO = "${ECR_REPO}-cache"
 def appList = [
 ]
 
@@ -17,7 +18,7 @@ if (MAP_OF_BRANCH_NAME.size() > 1) {
 
 projectName = JOB_NAME.split('/')[0].toLowerCase()
 TAG = "${TASK_BRANCH_NAME.toLowerCase()}-${BUILD_NUMBER}"
-currentBuild.displayName = "#${currentBuild.id}_${TAG}"
+currentBuild.displayName = "#${currentBuild.id}_${FR_BRANCH_NAME}"
 def startDate = new Date()
 
 if (BRANCH_NAME in env.keySet()) {
