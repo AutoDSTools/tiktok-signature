@@ -109,8 +109,8 @@ timestamps {
                                 amd64BuildCMD = "docker buildx build "+
                                     "--builder=${BUILDX_NAME}-amd64 " +
                                     "-f Dockerfile " +
-                                    "--cache-to type=registry,ref=${ECR_REPO}-cache:${TASK_BRANCH_NAME.toLowerCase()}-amd64,mode=max,image-manifest=true,oci-mediatypes=true " +
-                                    "--cache-from type=registry,ref=${ECR_REPO}-cache:${TASK_BRANCH_NAME.toLowerCase()}-amd64 " +
+                                    "--cache-to type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-amd64,mode=max,image-manifest=true,oci-mediatypes=true " +
+                                    "--cache-from type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-amd64 " +
                                     "--provenance=false "
 
                                 if (BRANCH_NAME in env.keySet() || isEnvironmentBuild == true) {
@@ -152,8 +152,8 @@ timestamps {
                                 armBuildCMD = "docker buildx build "+
                                         "--builder=${BUILDX_NAME}-arm " +
                                         "-f Dockerfile " +
-                                        "--cache-to type=registry,ref=${ECR_REPO}-cache:${TASK_BRANCH_NAME.toLowerCase()}-arm,mode=max,image-manifest=true,oci-mediatypes=true " +
-                                        "--cache-from type=registry,ref=${ECR_REPO}-cache:${TASK_BRANCH_NAME.toLowerCase()}-arm " +
+                                        "--cache-to type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm,mode=max,image-manifest=true,oci-mediatypes=true " +
+                                        "--cache-from type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm " +
                                         "--provenance=false "
 
                                 if (BRANCH_NAME in env.keySet() || isEnvironmentBuild == true) {
