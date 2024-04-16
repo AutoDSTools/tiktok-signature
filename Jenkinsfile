@@ -17,7 +17,6 @@ if (MAP_OF_BRANCH_NAME.size() > 1) {
 }
 
 projectName = JOB_NAME.split('/')[0].toLowerCase()
-TAG = "${TASK_BRANCH_NAME.toLowerCase()}-${BUILD_NUMBER}"
 currentBuild.displayName = "#${currentBuild.id}_${FR_BRANCH_NAME}"
 def startDate = new Date()
 
@@ -31,6 +30,11 @@ def BUILDX_NAME = "tiktok-signature-${NAMESPACE.toLowerCase()}"
 def BUILDX_NAMESPACE = "testing"
 def BUILDX_RESOURCE_CPU = "2000m"
 def BUILDX_RESOURCE_RAM = "4000Mi"
+
+TAG = "${NAMESPACE.toLowerCase()}-${BUILD_NUMBER}"
+
+
+
 
 AGENT = 'master'
 
