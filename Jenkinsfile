@@ -249,9 +249,6 @@ timestamps {
                         }
 
                     }
-                    def endDate = new Date()
-                    def tookTime = groovy.time.TimeCategory.minus(endDate,startDate).toString()
-                    slackSend color: 'good', message: "Total deployment time for ${projectName}: ${tookTime}"
                 } else {
                     println "Skip deploy for ${BRANCH_NAME} branch"
                 }
