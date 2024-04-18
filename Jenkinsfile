@@ -20,7 +20,7 @@ if (MAP_OF_BRANCH_NAME.size() > 1) {
 
 projectName = JOB_NAME.split('/')[0].toLowerCase()
 currentBuild.displayName = "#${currentBuild.id}_${FR_BRANCH_NAME}"
-def startDate = new Date()
+startDate = new Date()
 
 if (BRANCH_NAME in env.keySet()) {
     NAMESPACE = env[BRANCH_NAME]
