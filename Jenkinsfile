@@ -8,6 +8,8 @@ def appList = [
 ]
 
 def env = ['develop':'staging-scrapers','master':'prod-scrapers']
+def valuesName = ['develop':'staging','master':'prod']
+
 // BRANCH_NAME may contain the path. Extract the part we need
 MAP_OF_BRANCH_NAME = BRANCH_NAME.split('/')
 FR_BRANCH_NAME = MAP_OF_BRANCH_NAME[0].replace("_", "-")
