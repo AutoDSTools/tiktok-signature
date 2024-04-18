@@ -23,7 +23,7 @@ def startDate = new Date()
 if (BRANCH_NAME in env.keySet()) {
     NAMESPACE = env[BRANCH_NAME]
 } else {
-    NAMESPACE = 'staging'
+    NAMESPACE = FR_BRANCH_NAME
 }
 
 def BUILDX_NAME = "tiktok-signature-${NAMESPACE.toLowerCase()}"
@@ -31,10 +31,7 @@ def BUILDX_NAMESPACE = "testing"
 def BUILDX_RESOURCE_CPU = "2000m"
 def BUILDX_RESOURCE_RAM = "4000Mi"
 
-TAG = "${NAMESPACE.toLowerCase()}-${BUILD_NUMBER}"
-
-
-
+TAG = "${FR_BRANCH_NAME.toLowerCase()}-${BUILD_NUMBER}"
 
 AGENT = 'master'
 
@@ -118,16 +115,16 @@ timestamps {
                                     "--provenance=false "
 
                                 if (BRANCH_NAME in env.keySet() || isEnvironmentBuild == true) {
-                                    amd64BuildCMD = amd64BuildCMD +
+                                    amd64BuildCMD +=
                                         "--push " +
                                         "-t ${ECR_REPO}:${TAG}-amd64 "
 
                                 } else {
-                                    amd64BuildCMD = amd64BuildCMD +
+                                    amd64BuildCMD +=
                                         "--output type=cacheonly "
                                 }
 
-                                amd64BuildCMD = amd64BuildCMD + "."
+                                amd64BuildCMD += "."
 
                                 // Build image with try
                                 try {
@@ -154,23 +151,23 @@ timestamps {
 
                                 // Make build cmd
                                 armBuildCMD = "docker buildx build "+
-                                        "--builder=${BUILDX_NAME}-arm " +
-                                        "-f Dockerfile " +
-                                        "--cache-to type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm,mode=max,image-manifest=true,oci-mediatypes=true " +
-                                        "--cache-from type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm " +
-                                        "--provenance=false "
+                                    "--builder=${BUILDX_NAME}-arm " +
+                                    "-f Dockerfile " +
+                                    "--cache-to type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm,mode=max,image-manifest=true,oci-mediatypes=true " +
+                                    "--cache-from type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm " +
+                                    "--provenance=false "
 
                                 if (BRANCH_NAME in env.keySet() || isEnvironmentBuild == true) {
-                                    armBuildCMD = armBuildCMD +
-                                            "--push " +
-                                            "-t ${ECR_REPO}:${TAG}-arm "
+                                    armBuildCMD +=
+                                        "--push " +
+                                        "-t ${ECR_REPO}:${TAG}-arm "
 
                                 } else {
-                                    armBuildCMD = armBuildCMD +
-                                            "--output type=cacheonly "
+                                    armBuildCMD +=
+                                        "--output type=cacheonly "
                                 }
 
-                                armBuildCMD = armBuildCMD + "."
+                                armBuildCMD += "."
 
                                 // Build image with try
                                 try {
@@ -326,4 +323,3 @@ def logger(String message, String level = 'INFO') {
 
     echo "\n${startSequence}${message}${endSequence}\n"
 }
-
