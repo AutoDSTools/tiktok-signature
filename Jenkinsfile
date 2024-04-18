@@ -249,9 +249,6 @@ timestamps {
                         }
 
                     }
-                    def endDate = new Date()
-                    def tookTime = groovy.time.TimeCategory.minus(endDate,startDate).toString()
-                    slackSend color: 'good', message: "Total deployment time for ${projectName}: ${tookTime}"
                 } else {
                     println "Skip deploy for ${BRANCH_NAME} branch"
                 }
@@ -259,7 +256,7 @@ timestamps {
                 currentBuild.result = 'FAILED'
                 throw ex
             } finally {
-                // notifySlack(currentBuild.result)
+                notifySlack(currentBuild.result)
 
                 // Delete builder
                 sh """
@@ -279,7 +276,7 @@ def notifySlack(String buildStatus) {
     def endDate = new Date()
     def tookTime = groovy.time.TimeCategory.minus(endDate, startDate).toString()
 
-    def message = "Deployment for `<CHANGE THIS>` in ${NAMESPACE} is ${buildStatus}: #${env.BUILD_NUMBER}:\n Details: ${env.BUILD_URL}\n Total deployment time for orders-api: ${tookTime}"
+    def message = "Deployment for `tiktok-signature` in ${NAMESPACE} is ${buildStatus}: #${env.BUILD_NUMBER}:\n Details: ${env.BUILD_URL}\n Total deployment time for tiktok-signature: ${tookTime}"
 
     def color
     if (buildStatus == 'STARTED') {
