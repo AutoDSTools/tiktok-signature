@@ -276,7 +276,7 @@ def notifySlack(String buildStatus) {
     def endDate = new Date()
     def tookTime = groovy.time.TimeCategory.minus(endDate, startDate).toString()
 
-    def message = "Deployment for `tiktok-signature` in ${NAMESPACE} is ${buildStatus}: #${env.BUILD_NUMBER}:\n Details: ${env.BUILD_URL}\n Total deployment time for tiktok-signature: ${tookTime}"
+    def message = "Deployment for `${JOB_NAME}` in ${NAMESPACE} is ${buildStatus}: #${env.BUILD_NUMBER}:\n Details: ${env.BUILD_URL}\n Total deployment time for ${JOB_NAME}: ${tookTime}"
 
     def color
     if (buildStatus == 'STARTED') {
