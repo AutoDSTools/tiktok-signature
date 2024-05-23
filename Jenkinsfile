@@ -2,8 +2,7 @@ properties([
     disableConcurrentBuilds()
 ])
 
-ECR_REPO = '956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature'
-def ECR_CACHE_REPO = "${ECR_REPO}-cache"
+
 def appList = [
 ]
 
@@ -28,28 +27,32 @@ if (BRANCH_NAME in env.keySet()) {
     NAMESPACE = FR_BRANCH_NAME
 }
 
+ECR_REPO = '956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature'
+TAG = "${FR_BRANCH_NAME.toLowerCase()}-${BUILD_NUMBER}"
+TAG_AMD64 = "${TAG}-amd64"
+TAG_ARM = "${TAG}-arm"
+TAG_CACHE_AMD64 = "cache-${FR_BRANCH_NAME.toLowerCase()}-amd64"
+TAG_CACHE_ARM = "cache-${FR_BRANCH_NAME.toLowerCase()}-arm"
+
 def BUILDX_NAME = "tiktok-signature-${NAMESPACE.toLowerCase()}"
+def BUILDX_NAME_AMD64 = "${BUILDX_NAME}-amd64"
+def BUILDX_NAME_ARM = "${BUILDX_NAME}-arm"
 def BUILDX_NAMESPACE = "testing"
 def BUILDX_RESOURCE_CPU = "2000m"
 def BUILDX_RESOURCE_RAM = "4000Mi"
 
-TAG = "${FR_BRANCH_NAME.toLowerCase()}-${BUILD_NUMBER}"
-
 AGENT = 'master'
+def imageName = "tiktok-signature"
 
 if (BRANCH_NAME in env.keySet()) {
-    ECR_REPO = "956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature"
     BRANCH_NAME_JIRA = "${BRANCH_NAME}"
-    imageName = "tiktok-signature"
     baseValuesName = valuesName[BRANCH_NAME]
 } else {
-    ECR_REPO = "956449821269.dkr.ecr.us-west-2.amazonaws.com/tiktok-signature-environment"
     BRANCH_NAME_JIRA = "${TASK_BRANCH_NAME}"
     isEnvironmentBuild = true
     if (BRANCH_NAME.contains('PR-')) {
         isEnvironmentBuild = false
     }
-    imageName = "tiktok-signature-environment"
     baseValuesName = "staging"
 }
 
@@ -102,24 +105,24 @@ timestamps {
                                     docker buildx create \
                                         --use \
                                         --append \
-                                        --name=${BUILDX_NAME}-amd64 \
+                                        --name=${BUILDX_NAME_AMD64} \
                                         --driver=kubernetes \
-                                        --node=${BUILDX_NAME}-amd64 \
+                                        --node=${BUILDX_NAME_AMD64} \
                                         '--driver-opt=namespace=${BUILDX_NAMESPACE},"nodeselector=environment=General,lifecycle=Ec2Spot,project=Build",requests.cpu=${BUILDX_RESOURCE_CPU},requests.memory=${BUILDX_RESOURCE_RAM},limits.cpu=${BUILDX_RESOURCE_CPU},limits.memory=${BUILDX_RESOURCE_RAM}'
                                 """
 
                                 // Make build cmd
                                 amd64BuildCMD = "docker buildx build "+
-                                    "--builder=${BUILDX_NAME}-amd64 " +
+                                    "--builder=${BUILDX_NAME_AMD64} " +
                                     "-f Dockerfile " +
-                                    "--cache-to type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-amd64,mode=max,image-manifest=true,oci-mediatypes=true " +
-                                    "--cache-from type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-amd64 " +
+                                    "--cache-to type=registry,ref=${ECR_REPO}:${TAG_CACHE_AMD64},mode=max,image-manifest=true,oci-mediatypes=true " +
+                                    "--cache-from type=registry,ref=${ECR_REPO}:${TAG_CACHE_AMD64} " +
                                     "--provenance=false "
 
                                 if (BRANCH_NAME in env.keySet() || isEnvironmentBuild == true) {
                                     amd64BuildCMD +=
                                         "--push " +
-                                        "-t ${ECR_REPO}:${TAG}-amd64 "
+                                        "-t ${ECR_REPO}:${TAG_AMD64} "
 
                                 } else {
                                     amd64BuildCMD +=
@@ -145,24 +148,24 @@ timestamps {
                                     docker buildx create \
                                         --use \
                                         --append \
-                                        --name=${BUILDX_NAME}-arm \
+                                        --name=${BUILDX_NAME_ARM} \
                                         --driver=kubernetes \
-                                        --node=${BUILDX_NAME}-arm \
+                                        --node=${BUILDX_NAME_ARM} \
                                         '--driver-opt=namespace=${BUILDX_NAMESPACE},"nodeselector=environment=General,lifecycle=Ec2Spot,project=BuildArm",requests.cpu=${BUILDX_RESOURCE_CPU},requests.memory=${BUILDX_RESOURCE_RAM},limits.cpu=${BUILDX_RESOURCE_CPU},limits.memory=${BUILDX_RESOURCE_RAM}'
                                 """
 
                                 // Make build cmd
                                 armBuildCMD = "docker buildx build "+
-                                    "--builder=${BUILDX_NAME}-arm " +
+                                    "--builder=${BUILDX_NAME_ARM} " +
                                     "-f Dockerfile " +
-                                    "--cache-to type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm,mode=max,image-manifest=true,oci-mediatypes=true " +
-                                    "--cache-from type=registry,ref=${ECR_CACHE_REPO}:${NAMESPACE.toLowerCase()}-arm " +
+                                    "--cache-to type=registry,ref=${ECR_REPO}:${TAG_CACHE_ARM},mode=max,image-manifest=true,oci-mediatypes=true " +
+                                    "--cache-from type=registry,ref=${ECR_REPO}:${TAG_CACHE_ARM} " +
                                     "--provenance=false "
 
                                 if (BRANCH_NAME in env.keySet() || isEnvironmentBuild == true) {
                                     armBuildCMD +=
                                         "--push " +
-                                        "-t ${ECR_REPO}:${TAG}-arm "
+                                        "-t ${ECR_REPO}:${TAG_ARM} "
 
                                 } else {
                                     armBuildCMD +=
@@ -187,13 +190,12 @@ timestamps {
                         sh """
                             docker manifest create \
                                 ${ECR_REPO}:${TAG} \
-                                ${ECR_REPO}:${TAG}-amd64 \
-                                ${ECR_REPO}:${TAG}-arm
+                                ${ECR_REPO}:${TAG_AMD64} \
+                                ${ECR_REPO}:${TAG_ARM}
                             docker manifest push ${ECR_REPO}:${TAG}
                             docker manifest rm ${ECR_REPO}:${TAG}
                         """
-
-                        }
+                    }
                 }
 
                 stage('Check vulnerabilities') {
@@ -260,8 +262,8 @@ timestamps {
 
                 // Delete builder
                 sh """
-                    docker buildx rm ${BUILDX_NAME}-amd64
-                    docker buildx rm ${BUILDX_NAME}-arm
+                    docker buildx rm ${BUILDX_NAME_AMD64}
+                    docker buildx rm ${BUILDX_NAME_ARM}
                 """
             }
 
